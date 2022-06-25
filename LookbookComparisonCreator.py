@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import time
 import subprocess
@@ -9,52 +11,22 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
 
+# ==================== #
+# Choose your preferred output resolution. Should be 16:9 for the best result
+OUTPUT_RESOLUTION = "1920:1080"
+
+# Resolution of the input clips, only change if you are not using
+# the default 1080p clips
+INPUT_RESOLUTION = "1920:1080"
+
+# ==================== #
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 def main():
     app = LookbookComparisonCreatorApp()
     app.mainloop()
-
-    #source_dir = "540"
-    #for key in DEFAULT_KEYS:
-    #    output_file = f"{OUTPUT_DIR}/{('_'.join(key)).replace(' ', '_').replace('|', '+')}.mov"
-    #    create_comparison_clips(key, source_dir, output_file)
-
-# CLI
-OUTPUT_RESOLUTION = "1920:1080"
-INPUT_RESOLUTION = "1920:1080"
-OUTPUT_DIR = "out_update"
-
-DEFAULT_KEYS = [
-    ['Key', 'Close', 'Orbiter|Robe', '°', '-Frost'],
-    [''],
-    ['Kicker'],
-    ['Key', 'Close'],
-    ['Key', 'Wide'],
-    ['Key', 'Close', 'Orbiter'],
-    ['Key', 'Wide', 'Orbiter'],
-    ['Kicker', 'Orbiter'],
-    ['Key', 'Close', 'Maxi Mix'],
-    ['Key', 'Wide', 'Maxi Mix'],
-    ['Kicker', 'Maxi Mix'],
-    ['Key', 'Close', 'Mini Mix'],
-    ['Key', 'Wide', 'Mini Mix'],
-    ['Kicker', 'Mini Mix'],
-    ['Key', 'Close', 'Astera'],
-    ['Key', 'Wide', 'Astera'],
-    ['Kicker', 'Astera'],
-    ['Key', 'Close', 'LIGHTBRIDGE'],
-    ['Key', 'Wide', 'LIGHTBRIDGE'],
-    ['Kicker', 'LIGHTBRIDGE'],
-    ['Key', 'Close', 'Robe'],
-    ['Key', 'Wide', 'Robe'],
-    ['Kicker', 'Robe'],
-    ['Key', 'Close', 'SL1'],
-    ['Key', 'Wide', 'SL1'],
-    ['Kicker', 'SL1'],
-    ['Key', 'Close', 'Dash Light'],
-    ['Key', 'Wide', 'Dash Light'],
-    ['Kicker', 'Dash Light'],
-]
 
 
 def create_comparison_clips(ffmpeg_cmd, key, source_dir, output_file):
@@ -150,13 +122,14 @@ def create_comparison_clips(ffmpeg_cmd, key, source_dir, output_file):
     print(run_output)
 
 
-# GUI
+# ==== GUI ==== #
 
 class LookbookComparisonCreatorApp(tk.Tk):
 
     def __init__(self):
         super().__init__()
         self.title("Lookbook Comparison Creator")
+
         # Place Window Centered
         width = 450
         height = 190
@@ -169,6 +142,7 @@ class LookbookComparisonCreatorApp(tk.Tk):
         self.minsize(width=width, height=height)
         self.maxsize(width=width + 200, height=height)
 
+        # Base Frame
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.frame = ttk.Frame(padding='10')
@@ -178,6 +152,9 @@ class LookbookComparisonCreatorApp(tk.Tk):
 
         # FFMPEG
         self.ffmpeg_cmd = tk.StringVar(self, 'ffmpeg')
+        if platform.system() == 'Windows':
+            self.ffmpeg_cmd.set('ffmpeg.exe')
+
         self.ffmpeg_label = ttk.Label(self.frame, text="FFmpeg:")
         self.ffmpeg_label.grid(row=0, column=0, padx=5, pady=5, sticky="W")
 
@@ -195,6 +172,11 @@ class LookbookComparisonCreatorApp(tk.Tk):
 
         # SOURCE DIRECTORY
         self.source_dir = tk.StringVar(self, '~')
+
+        clips_dir = os.path.join(SCRIPT_DIR, "Clips")
+        if os.path.isdir(clips_dir):
+            self.source_dir.set(clips_dir)
+
         self.source_label = ttk.Label(self.frame, text="Source:")
         self.source_label.grid(row=1, column=0, padx=5, pady=5, sticky="W")
         self.source_entry = ttk.Entry(
