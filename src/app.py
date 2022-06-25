@@ -68,6 +68,11 @@ class LookbookComparisonCreatorApp(tk.Tk):
         self.key_entry.grid(
                 row=2, column=1, columnspan=3, sticky="we", padx=5, pady=5)
 
+        # RUN
+        self.run_button = ttk.Button(
+        self, text="Create Quicktime", command=self.run)
+        self.run_button.grid(row=0, column=3, sticky="ES", padx=5, pady=5)
+
     def select_source(self):
         initialdir = os.path.dirname(self.ffmpeg_cmd.get())
         new_source = fd.askdirectory(
@@ -83,6 +88,9 @@ class LookbookComparisonCreatorApp(tk.Tk):
             self.ffmpeg_cmd.set(new_ffmpeg_cmd)
 
 
+    def run(self):
+
+    
 def main():
     app = LookbookComparisonCreatorApp()
     app.mainloop()
