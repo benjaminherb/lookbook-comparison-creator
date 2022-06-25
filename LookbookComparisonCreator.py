@@ -80,7 +80,7 @@ def create_comparison_clips(ffmpeg_cmd, key, source_dir, output_file):
         grid_h, grid_v = [squared + 1, squared]
     else:
         grid_h, grid_v = [squared, squared]
-    print(f"H/V {grid_h} - {grid_v}")
+    print(f"CREATING {grid_h}x{grid_v} GRID (HxV)")
 
     # pad inputs with black videos if there is no good grid possible
     for i in range(0, (grid_h) * (grid_v) - len(input_files)):
@@ -92,16 +92,27 @@ def create_comparison_clips(ffmpeg_cmd, key, source_dir, output_file):
     filter_string = ""
     down_scale_string = ""
     v = 0
-    for i in range(0, grid_v):
+
+    if len(input_files) <= 1:
+        print(f"Not enough clips to create a grid ({len(input_files)})")
+        return
+
+    if len(input_files) == 2:
         for j in range(0, grid_h):
-            filter_string += f"[{v}:v]"
+            filter_string += f"[{j}:v]"
             v += 1
-        filter_string += f"hstack=inputs={grid_h}[stack_{i}];"
+        filter_string += f"hstack=inputs={grid_h}[v];"
+    else:
+        for i in range(0, grid_v):
+            for j in range(0, grid_h):
+                filter_string += f"[{v}:v]"
+                v += 1
+            filter_string += f"hstack=inputs={grid_h}[stack_{i}];"
 
-    for i in range(0, grid_v):
-        filter_string += f"[stack_{i}]"
+        for i in range(0, grid_v):
+            filter_string += f"[stack_{i}]"
 
-    filter_string += f"vstack=inputs={grid_v}[v];"
+        filter_string += f"vstack=inputs={grid_v}[v];"
     filter_string += f"[v]scale={OUTPUT_RESOLUTION}:force_original_aspect_ratio=decrease,pad={OUTPUT_RESOLUTION}:(ow-iw)/2:(oh-ih)/2[v]"
 
     ffmpeg_cmd.extend([
@@ -116,10 +127,9 @@ def create_comparison_clips(ffmpeg_cmd, key, source_dir, output_file):
         output_file
         ])
 
-    print(f"FFMPEG CMD: \n{ffmpeg_cmd}")
+    print(f"RUNNING FFMPEG COMMAND: \n{ffmpeg_cmd}")
 
-    run_output = subprocess.run(ffmpeg_cmd, capture_output=True)
-    print(run_output)
+    subprocess.run(ffmpeg_cmd, capture_output=True)
 
 
 # ==== GUI ==== #
@@ -221,15 +231,17 @@ class LookbookComparisonCreatorApp(tk.Tk):
     def run(self):
         key = self.key_string.get().split(',')
         initial_filename = f"{('_'.join(key)).replace(' ', '_').replace('|', '+')}"
-        self.toggle_ui(state='disable')
         output_file = fd.asksaveasfilename(
                 initialdir='~', initialfile=initial_filename,
-                filetypes=[('Video Files', '*.mp4'), ('All Files', '*')])
+                filetypes=[('Video Files', '*.mp4'), ('All Files', '*')],
+                defaultextension='.mp4')
 
         # if it was canceled
-        if output_file == "":
+        if not output_file:
             return
 
+        print("\nCREATING COMPARISON VIDEO\n")
+        self.toggle_ui(state='disable')
         self.render_process = multiprocessing.Process(
                 target=create_comparison_clips,
                 args=(
@@ -240,7 +252,6 @@ class LookbookComparisonCreatorApp(tk.Tk):
         while self.render_process.is_alive():
             self.update()
             time.sleep(1)
-            print("RUNNING")
 
         self.render_process.join()
         self.toggle_ui('enable')
