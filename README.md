@@ -1,13 +1,10 @@
 # LOOKBOOK COMPARISON CREATOR
 
-Eine genauere Beschreibung / Download Link der Daten gibt es in dem [HdM DokuWiki](vfx-web.hdm-stuttgart.de/dokuwiki/) und eine aktuelle Version dieses Tools auf [Github](github.com/benjaminherb/lookbook-comparison-creator).
+Das Python-Tool erstellt aus dem Lookbook mithilfe von FFmpeg Vergleichs-/Übersichtsvideos entsprechend vorher gegebener Eigenschaften. Dabei werden jeweils die passenden Einstellungen in 1080p und h264 ausgegeben.
+Eine genauere Beschreibung / Download Link der Daten gibt es in dem [HdM DokuWiki](https://vfx-web.hdm-stuttgart.de/dokuwiki/doku.php?id=dreh:licht:led-licht:spfilm22) und eine aktuelle Version dieses Tools auf [Github](github.com/benjaminherb/lookbook-comparison-creator).
 
 ![](LookbookComparisonCreatorScreenshot.png "Screenshot")
 
-
-## StuPro Studiotechnik 2022
-
-Das Python-Tool erstellt aus dem Lookbook mithilfe von FFmpeg Vergleichs-/Übersichtsvideos entsprechend vorher gegebener Eigenschaften. Dabei werden jeweils die passenden Einstellungen in 1080p und h264 ausgegeben.
 
 ## Voraussetzungen
 Für das Tool wird [Python 3](https://www.python.org/downloads/) und [FFmpeg](https://ffmpeg.org/download.html) benötigt.
